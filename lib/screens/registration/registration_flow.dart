@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easyride/cubits/registration/registration_cubit.dart';
 import 'package:easyride/cubits/registration/registration_state.dart';
-import 'package:easyride/cubits/navigation_cubit.dart'; // To navigate to home when registration is done
+import 'package:easyride/cubits/navigation_cubit.dart'; // Still needed for other navigation logic if any, but not directly for 'completed'
 import 'package:easyride/screens/registration/name_screen.dart';
 import 'package:easyride/screens/registration/phone_screen.dart';
-import 'email_screen.dart'; // CORRECTED IMPORT: Use the new name
+// CORRECTED IMPORT: Changed from email_screen.dart
+import 'package:easyride/screens/login_screen.dart';
 
-class RegistrationFlowContainer extends StatelessWidget { // Keep this name for consistency
+import 'email_screen.dart'; // NEW IMPORT: Required to navigate to LoginScreen
+
+class RegistrationFlowContainer extends StatelessWidget {
   const RegistrationFlowContainer({super.key});
 
   @override
@@ -17,17 +20,24 @@ class RegistrationFlowContainer extends StatelessWidget { // Keep this name for 
     return BlocConsumer<RegistrationCubit, RegistrationState>(
       listener: (context, state) {
         // This listener ensures that once registration is 'completed'
-        // the app navigates to the home screen (or wherever your main app starts).
-        if (state.currentStep == RegistrationStep.completed) {
-          // You could also show a success message here before navigating.
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful! Welcome to EasyRide.'),
-              backgroundColor: Colors.green, // A success color
-            ),
-          );
-          // Navigate to the home page using your global NavigationCubit
-          context.read<NavigationCubit>().navigateToHome();
+        // the app navigates to the desired screen.
+        if (state.currentStep == RegistrationStep.completed && state.errorMessage == null) {
+          // The snackbar with "Registration successful!" is already shown by EmailPasswordScreen's listener.
+          // Here, we handle the final navigation.
+
+          // Changed: Navigate to LoginScreen instead of Home after successful registration.
+          // This allows the user to log in with their newly created (and verified) account.
+          Future.delayed(const Duration(seconds: 3), () { // Keep delay to allow snackbar to be seen
+            // Using pushReplacement to clear the registration flow from the navigation stack
+            // and replace it with the LoginScreen.
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+
+            // Optional: Consider resetting the registration cubit state here
+            // to clear data from previous registration attempt if needed for next time.
+            // context.read<RegistrationCubit>().resetState(); // You'd need to add a resetState method to your cubit
+          });
         }
       },
       builder: (context, state) {
@@ -36,7 +46,7 @@ class RegistrationFlowContainer extends StatelessWidget { // Keep this name for 
         // is crucial for AnimatedSwitcher to identify different widgets.
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300), // Duration of the transition
-          child: _getCurrentRegistrationScreen(state.currentStep), // CORRECTED: Use state.currentStep
+          child: _getCurrentRegistrationScreen(state.currentStep), // Use state.currentStep
         );
       },
     );
@@ -44,20 +54,20 @@ class RegistrationFlowContainer extends StatelessWidget { // Keep this name for 
 
   // Helper method to return the correct screen widget based on the current step
   Widget _getCurrentRegistrationScreen(RegistrationStep step) {
-    switch (step) { // CORRECTED: Switch on the RegistrationStep enum
+    switch (step) {
       case RegistrationStep.name:
         return const NameScreen(key: ValueKey('nameScreen')); // Assign a unique key
       case RegistrationStep.phone:
         return const PhoneScreen(key: ValueKey('phoneScreen')); // Assign a unique key
-      case RegistrationStep.emailPassword: // CORRECTED: Use the new enum value for Email/Password screen
-        return const EmailPasswordScreen(key: ValueKey('emailPasswordScreen')); // CORRECTED: Use the new screen widget
+      case RegistrationStep.emailPassword:
+        return const EmailPasswordScreen(key: ValueKey('emailPasswordScreen')); // Correctly references EmailPasswordScreen
       case RegistrationStep.completed:
-      // If the state is 'completed', this case should ideally not be reached
-      // because the listener should trigger navigation.
-      // As a fallback, you could show a temporary loading screen or a success message.
+      // When the state is 'completed', the listener handles the navigation away.
+      // As a fallback, you could show a temporary loading screen or a success message
+      // here just before the navigation takes effect.
         return const Scaffold(
           body: Center(
-            child: CircularProgressIndicator(), // Or a success animation/message
+            child: CircularProgressIndicator(), // Or a brief "Success!" message
           ),
         );
     }

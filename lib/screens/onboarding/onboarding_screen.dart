@@ -3,18 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cubits/onboarding_cubit.dart';
-// REMOVED: No longer directly handling RegistrationCubit or NameScreen here.
-// import '../../cubits/registration/registration_cubit.dart';
-// import '../registration/name_screen.dart';
 import '../../models/onboarding_content.dart';
-import '../../cubits/navigation_cubit.dart'; // IMPORTANT: We now need NavigationCubit
+import '../../cubits/navigation_cubit.dart';
+// CORRECTED: Import app_colors with alias
+import 'package:easyride/constants/app_colors.dart' as AppColors;
 
-// Constants for colors (still a good candidate to move to lib/constants/app_colors.dart
-// to centralize all app-wide color definitions for better consistency and maintainability).
-const Color primaryGreen = Color(0xFF4CAF50);
-const Color lightGreen = Color(0xFF81C784);
-const Color textMedium = Color(0xFF616161);
-const Color backgroundColor = Colors.white;
+// REMOVED: Local color constants are now in app_colors.dart
+// const Color primaryGreen = Color(0xFF4CAF50);
+// const Color lightGreen = Color(0xFF81C784);
+// const Color textMedium = Color(0xFF616161);
+// const Color backgroundColor = Colors.white;
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -38,9 +36,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  // UPDATED: This method now instructs NavigationCubit to change the app's main page.
-  void _navigateToRegistrationFlow() {
-    context.read<NavigationCubit>().navigateToRegistration();
+  // UPDATED: This method now instructs NavigationCubit to navigate to the LOGIN screen.
+  void _navigateToLoginScreen() {
+    context.read<NavigationCubit>().navigateToLogin();
   }
 
   @override
@@ -50,9 +48,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isTablet = size.width > 600;
 
     return BlocProvider(
-      create: (_) => OnboardingCubit(), // OnboardingCubit is still relevant for managing internal page state
+      create: (_) => OnboardingCubit(),
       child: Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor, // Use AppColors prefix
         body: SafeArea(
           child: Stack(
             children: [
@@ -86,7 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         style: TextStyle(
                                           fontSize: isSmallScreen ? 32 : 42,
                                           fontWeight: FontWeight.bold,
-                                          color: primaryGreen,
+                                          color: AppColors.primaryGreen, // Use AppColors prefix
                                           letterSpacing: 1.5,
                                         ),
                                       ),
@@ -100,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: isSmallScreen ? 17 : 20,
-                                            color: textMedium,
+                                            color: AppColors.textMedium, // Use AppColors prefix
                                             height: 1.6,
                                           ),
                                         ),
@@ -179,8 +177,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       width: currentPage == index ? 30 : 10,
                                       decoration: BoxDecoration(
                                         color: currentPage == index
-                                            ? primaryGreen
-                                            : lightGreen.withOpacity(0.7),
+                                            ? AppColors.primaryGreen // Use AppColors prefix
+                                            : AppColors.lightGreen.withOpacity(0.7), // Use AppColors prefix
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
@@ -198,7 +196,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               return ElevatedButton(
                                 onPressed: () {
                                   if (isLastPage) {
-                                    _navigateToRegistrationFlow(); // Use the updated method
+                                    _navigateToLoginScreen(); // Use the updated method to go to Login
                                   } else {
                                     _pageController.nextPage(
                                       duration: const Duration(milliseconds: 400),
@@ -212,14 +210,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
-                                  backgroundColor: primaryGreen,
+                                  backgroundColor: AppColors.primaryGreen, // Use AppColors prefix
                                   foregroundColor: Colors.white,
                                   textStyle: TextStyle(
                                     fontSize: isSmallScreen ? 18 : 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   elevation: 5,
-                                  shadowColor: primaryGreen.withOpacity(0.4),
+                                  shadowColor: AppColors.primaryGreen.withOpacity(0.4), // Use AppColors prefix
                                 ),
                                 child: Text(isLastPage ? 'Get Started' : 'Continue'),
                               );
@@ -237,12 +235,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 top: 16,
                 right: 20,
                 child: TextButton(
-                  onPressed: _navigateToRegistrationFlow, // Use the updated method
+                  onPressed: _navigateToLoginScreen, // Use the updated method to go to Login
                   child: const Text(
                     'Skip',
                     style: TextStyle(
                       fontSize: 16,
-                      color: primaryGreen,
+                      color: AppColors.primaryGreen, // Use AppColors prefix
                       fontWeight: FontWeight.bold,
                     ),
                   ),
