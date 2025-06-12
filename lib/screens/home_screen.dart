@@ -1,15 +1,17 @@
 // lib/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
-// Remove unused imports if you're not using them:
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:easyride/cubits/navigation_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // <--- MAKE SURE THIS IS IMPORTED
+import 'package:easyride/cubits/navigation_cubit.dart'; // <--- MAKE SURE THIS IS IMPORTED
 import 'package:easyride/constants/app_colors.dart' as AppColors;
 import 'package:easyride/widgets/app_option_card.dart';
 
+// You can remove these direct screen imports as NavigationCubit handles routing:
+// import 'package:easyride/screens/customer_screen.dart';
+// import 'package:easyride/screens/driver_screen.dart';
 // import 'package:lottie/lottie.dart'; // Uncomment if using Lottie
 
-class HomeScreen extends StatefulWidget { // Changed to StatefulWidget for header animation
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
@@ -26,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.initState();
     _headerAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // Longer duration for header fade/slide
+      duration: const Duration(milliseconds: 800),
     );
 
     _headerOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -43,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
     );
 
-    _headerAnimationController.forward(); // Start animation when screen loads
+    _headerAnimationController.forward();
   }
 
   @override
@@ -73,55 +75,55 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // --- Upper Part: Car Moving on Road UI with Animation ---
-                      FadeTransition( // Fade animation for header content
+                      FadeTransition(
                         opacity: _headerOpacityAnimation,
-                        child: SlideTransition( // Slide animation for header content
+                        child: SlideTransition(
                           position: _headerSlideAnimation,
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [AppColors.primaryGreen.withOpacity(0.95), AppColors.lightGreen.withOpacity(1.0)], // Slightly richer gradient
+                                colors: [AppColors.primaryGreen.withOpacity(0.95), AppColors.lightGreen.withOpacity(1.0)],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
                               borderRadius: const BorderRadius.vertical(
-                                bottom: Radius.circular(25), // Slightly more rounded header bottom
+                                bottom: Radius.circular(25),
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.15), // Slightly more prominent shadow
-                                  blurRadius: 20, // Increased blur for softer look
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 20,
                                   spreadRadius: 5,
-                                  offset: const Offset(0, 10), // More offset for depth
+                                  offset: const Offset(0, 10),
                                 ),
                               ],
                             ),
-                            padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 28 : 48), // Increased padding for more breathing room
+                            padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 28 : 48),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(
                                   "EasyRide",
                                   style: TextStyle(
-                                    fontSize: (isSmallScreen ? 34 : 68) * textScaleFactor, // Slightly larger font
-                                    fontWeight: FontWeight.w900, // Even bolder
+                                    fontSize: (isSmallScreen ? 34 : 68) * textScaleFactor,
+                                    fontWeight: FontWeight.w900,
                                     color: Colors.white,
-                                    letterSpacing: 1.5, // Increased letter spacing
+                                    letterSpacing: 1.5,
                                     shadows: [
                                       Shadow(
-                                        blurRadius: 3, // Stronger shadow
-                                        color: Colors.black.withOpacity(0.3), // Darker shadow
+                                        blurRadius: 3,
+                                        color: Colors.black.withOpacity(0.3),
                                         offset: const Offset(1.5, 1.5),
                                       ),
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: isSmallScreen ? 10 : 16), // Adjusted spacing
+                                SizedBox(height: isSmallScreen ? 10 : 16),
                                 Text(
                                   "Your Journey Starts Here",
                                   style: TextStyle(
-                                    fontSize: (isSmallScreen ? 15 : 24) * textScaleFactor, // Slightly larger font
+                                    fontSize: (isSmallScreen ? 15 : 24) * textScaleFactor,
                                     color: Colors.white.withOpacity(0.95),
                                     fontStyle: FontStyle.italic,
                                     shadows: [
@@ -133,12 +135,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: isSmallScreen ? 20 : 32), // Adjusted spacing
+                                SizedBox(height: isSmallScreen ? 20 : 32),
                                 /*
-                                // Lottie Animation Placeholder - Uncomment if you have the asset
                                 Lottie.asset(
                                   'assets/animations/car_driving.json',
-                                  height: isSmallScreen ? 65 : 200, // Adjusted Lottie height
+                                  height: isSmallScreen ? 65 : 200,
                                   fit: BoxFit.contain,
                                   repeat: true,
                                   animate: true,
@@ -146,20 +147,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 */
                                 Icon(
                                   Icons.drive_eta_rounded,
-                                  size: isSmallScreen ? 65 : 150, // Slightly larger icon
+                                  size: isSmallScreen ? 65 : 150,
                                   color: Colors.white,
                                   shadows: [
                                     Shadow(
-                                      blurRadius: 6, // Stronger icon shadow
+                                      blurRadius: 6,
                                       color: Colors.black.withOpacity(0.2),
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: isSmallScreen ? 10 : 16), // Adjusted spacing
+                                SizedBox(height: isSmallScreen ? 10 : 16),
                                 Text(
                                   "Connecting Passengers & Drivers",
                                   style: TextStyle(
-                                    fontSize: (isSmallScreen ? 12 : 18) * textScaleFactor, // Slightly larger font
+                                    fontSize: (isSmallScreen ? 12 : 18) * textScaleFactor,
                                     color: Colors.white.withOpacity(0.9),
                                     shadows: [
                                       Shadow(
@@ -176,46 +177,44 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ),
 
-                      // --- Spacer between sections ---
-                      SizedBox(height: isSmallScreen ? 32 : 56), // More generous spacing
+                      SizedBox(height: isSmallScreen ? 32 : 56),
 
-                      // --- Lower Part: Customer and Driver Options ---
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: size.width * 0.08), // Increased horizontal padding
+                        padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               "I want to...",
                               style: TextStyle(
-                                fontSize: (isSmallScreen ? 26 : 38) * textScaleFactor, // Slightly larger font
-                                fontWeight: FontWeight.w900, // Even bolder
+                                fontSize: (isSmallScreen ? 26 : 38) * textScaleFactor,
+                                fontWeight: FontWeight.w900,
                                 color: AppColors.textDark,
                                 letterSpacing: 1.2,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: isSmallScreen ? 24 : 40), // Adjusted spacing
+                            SizedBox(height: isSmallScreen ? 24 : 40),
                             Row(
                               children: [
                                 AppOptionCard(
                                   icon: Icons.person_outline,
                                   label: "Be a Customer",
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Customer option selected!"))
-                                    );
+                                    print('DEBUG: Tapped "Be a Customer" card!'); // <--- ADD THIS LINE
+                                    // <--- THIS IS THE CHANGE YOU NEED TO MAKE
+                                    context.read<NavigationCubit>().navigateToCustomerScreen();
                                   },
                                   isSmallScreen: isSmallScreen,
                                 ),
-                                const SizedBox(width: 24), // Increased horizontal spacing between cards
+                                const SizedBox(width: 24),
                                 AppOptionCard(
                                   icon: Icons.drive_eta,
                                   label: "Be a Driver",
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Driver option selected!"))
-                                    );
+                                    print('DEBUG: Tapped "Be a Driver" card!'); // <--- ADD THIS LINE
+                                    // <--- THIS IS THE CHANGE YOU NEED TO MAKE
+                                    context.read<NavigationCubit>().navigateToDriverScreen();
                                   },
                                   isSmallScreen: isSmallScreen,
                                 ),
@@ -224,10 +223,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
-                      // --- Bottom Spacer ---
-                      SizedBox(height: isSmallScreen ? 24 : 40), // More generous bottom spacing
+                      SizedBox(height: isSmallScreen ? 24 : 40),
                       Expanded(
-                        child: Container(), // Fills remaining space
+                        child: Container(),
                       ),
                     ],
                   ),

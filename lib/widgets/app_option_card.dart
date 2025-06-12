@@ -6,7 +6,7 @@ import 'package:easyride/constants/app_colors.dart' as AppColors;
 class AppOptionCard extends StatefulWidget {
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback onTap; // The callback from HomeScreen
   final bool isSmallScreen;
 
   const AppOptionCard({
@@ -45,35 +45,36 @@ class _AppOptionCardState extends State<AppOptionCard> with SingleTickerProvider
     super.dispose();
   }
 
-  void _onTapDown(TapDownDetails details) {
-    _controller.reverse(); // Scale down
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    _controller.forward(); // Scale back up
-    widget.onTap(); // Execute original onTap
-  }
-
-  void _onTapCancel() {
-    _controller.forward(); // Scale back up if tap is cancelled
-  }
-
   @override
   Widget build(BuildContext context) {
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
 
     return Expanded(
-      child: GestureDetector(
-        onTapDown: _onTapDown,
-        onTapUp: _onTapUp,
-        onTapCancel: _onTapCancel,
-        child: ScaleTransition( // Apply scale animation
-          scale: _scaleAnimation,
-          child: InkWell(
-            onTap: () {}, // InkWell's onTap is now handled by GestureDetector for animation
-            borderRadius: BorderRadius.circular(20),
-            splashColor: AppColors.primaryGreen.withOpacity(0.3), // Slightly more splash
-            highlightColor: Colors.transparent,
+      child: Material( // Wrap with Material to ensure InkWell behaves correctly
+        color: Colors.transparent, // Make Material transparent
+        child: InkWell( // <--- InkWell is now the primary tap handler
+          onTap: () {
+            // This is the main tap action. The animation should run first.
+            _controller.reverse().then((_) { // Scale down
+              _controller.forward(); // Scale back up
+              widget.onTap(); // Execute the original onTap from HomeScreen
+            });
+          },
+          onTapDown: (_) {
+            _controller.reverse(); // Immediate scale down on tap
+          },
+          onTapCancel: () {
+            _controller.forward(); // Scale back up if tap is cancelled
+          },
+          onTapUp: (_) {
+            // Animation and onTap are handled by the main onTap callback,
+            // so we don't need to do anything extra here.
+          },
+          borderRadius: BorderRadius.circular(20),
+          splashColor: AppColors.primaryGreen.withOpacity(0.3),
+          highlightColor: Colors.transparent, // Let animation handle highlight
+          child: ScaleTransition( // Apply scale animation
+            scale: _scaleAnimation,
             child: Container(
               padding: EdgeInsets.symmetric(
                 vertical: widget.isSmallScreen ? 12 : 28,
@@ -84,10 +85,10 @@ class _AppOptionCardState extends State<AppOptionCard> with SingleTickerProvider
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12), // Slightly more prominent shadow
-                    blurRadius: 16, // Softer blur
-                    spreadRadius: 3, // More spread
-                    offset: const Offset(0, 6), // More offset
+                    color: Colors.black.withOpacity(0.12),
+                    blurRadius: 16,
+                    spreadRadius: 3,
+                    offset: const Offset(0, 6),
                   ),
                 ],
                 border: Border.all(
@@ -105,7 +106,7 @@ class _AppOptionCardState extends State<AppOptionCard> with SingleTickerProvider
                     shadows: [
                       Shadow(
                         blurRadius: 4,
-                        color: Colors.black.withOpacity(0.15), // Slightly stronger icon shadow
+                        color: Colors.black.withOpacity(0.15),
                       ),
                     ],
                   ),
