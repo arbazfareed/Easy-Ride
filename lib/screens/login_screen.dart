@@ -3,8 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easyride/constants/app_colors.dart' as AppColors;
-import 'package:easyride/cubits/navigation_cubit.dart'; // To navigate to home or registration
-import 'package:easyride/screens/registration/name_screen.dart'; // Import NameScreen for 'Register Here' link
+import 'package:easyride/cubits/navigation_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,12 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // For form validation
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    // No state to pre-populate for a fresh login screen
   }
 
   @override
@@ -37,29 +35,21 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Placeholder for login logic - you'll integrate with an AuthCubit here later
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      FocusScope.of(context).unfocus(); // Dismiss keyboard
-      // In a real application, you would call your AuthCubit here:
-      // context.read<AuthCubit>().signInWithEmailPassword(
-      //   _emailController.text,
-      //   _passwordController.text,
-      // );
+      FocusScope.of(context).unfocus();
 
       print('Attempting to sign in with: ${_emailController.text}');
 
-      // On simulated successful login:
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Sign in successful!'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          duration: const Duration(seconds: 2), // Keep it brief
+          duration: const Duration(seconds: 2),
         ),
       );
-      // Navigate to home after a short delay to show the snackbar
       Future.delayed(const Duration(seconds: 2), () {
         context.read<NavigationCubit>().navigateToHome();
       });
@@ -69,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final isSmallScreen = size.height < 700;
     final isTablet = size.width > 600;
 
@@ -80,11 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
             Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isTablet ? 80 : 24,
+                  horizontal: isTablet ? size.width * 0.1 : 24,
                   vertical: isSmallScreen ? 16 : 32,
                 ),
                 child: Form(
-                  key: _formKey, // Associate form key
+                  key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,49 +83,55 @@ class _LoginScreenState extends State<LoginScreen> {
                       // --- Image, Header Icon and Subtitle ---
                       Column(
                         children: [
-                          // NEW: Image 'assets/images/s1.jpeg'
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(16), // Consistent with other screens
+                            borderRadius: BorderRadius.circular(16),
                             child: Image.asset(
                               'assets/images/s1.jpeg',
-                              height: isSmallScreen ? 120 : 180, // Adjust height
-                              width: isSmallScreen ? 120 : 180, // Keep it square or adjust
+                              height: isSmallScreen ? 120 : 180,
+                              width: isSmallScreen ? 120 : 180,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                // Fallback for image loading errors
                                 return Icon(
-                                  Icons.image_not_supported_outlined, // Placeholder icon
+                                  Icons.image_not_supported_outlined,
                                   size: isSmallScreen ? 100 : 150,
                                   color: AppColors.primaryGreen.withOpacity(0.6),
                                 );
                               },
                             ),
                           ),
-                          const SizedBox(height: 24), // Space between image and icon/text
+                          const SizedBox(height: 24),
 
                           Icon(
-                            Icons.login_outlined, // A clear login icon
+                            Icons.login_outlined,
                             size: isSmallScreen ? 60 : 80,
                             color: AppColors.primaryGreen,
                           ),
                           const SizedBox(height: 16),
-                          Text(
-                            "Welcome Back!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 32 : 42,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryGreen,
-                              letterSpacing: 1.5,
+                          // Enhanced responsiveness for "Welcome Back!" text
+                          FittedBox( // Ensures text fits horizontally, scaling if needed
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "Welcome Back!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: (isSmallScreen ? 32 : 42) * textScaleFactor,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryGreen,
+                                letterSpacing: 1.5,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            "Sign in to continue your journey.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 16 : 18,
-                              color: AppColors.textMedium,
+                          // Enhanced responsiveness for subtitle text
+                          FittedBox( // Ensures text fits horizontally, scaling if needed
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "Sign in to continue your journey.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: (isSmallScreen ? 16 : 18) * textScaleFactor,
+                                color: AppColors.textMedium,
+                              ),
                             ),
                           ),
                         ],
@@ -148,9 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         labelText: 'Email Address',
                         hintText: 'example@gmail.com',
                         keyboardType: TextInputType.emailAddress,
-                        onChanged: (value) {
-                          // This would typically update a cubit state for validation
-                        },
+                        onChanged: (value) {},
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -172,14 +167,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         labelText: 'Password',
                         hintText: 'Your password',
                         obscureText: !_isPasswordVisible,
-                        onChanged: (value) {
-                          // This would typically update a cubit state for validation
-                        },
+                        onChanged: (value) {},
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
                           }
-                          // Add more password validation rules here if needed
                           return null;
                         },
                         prefixIcon: Icon(Icons.lock_outline, color: AppColors.lightGreen),
@@ -216,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            _handleLogin(); // Call login logic
+                            _handleLogin();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryGreen,
@@ -227,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: EdgeInsets.zero,
                             elevation: 0,
                             textStyle: TextStyle(
-                              fontSize: isSmallScreen ? 18 : 22,
+                              fontSize: (isSmallScreen ? 18 : 22) * textScaleFactor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -248,22 +240,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             "Don't have an account? ",
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 14 : 16,
+                              fontSize: (isSmallScreen ? 14 : 16) * textScaleFactor,
                               color: AppColors.textMedium,
                             ),
                           ),
                           GestureDetector(
                             onTap: () {
-                              FocusScope.of(context).unfocus(); // Dismiss keyboard
-                              // Navigate to the NameScreen (first step of registration)
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(builder: (context) => const NameScreen()),
-                              );
+                              FocusScope.of(context).unfocus();
+                              context.read<NavigationCubit>().navigateToRegistration();
                             },
                             child: Text(
                               "Register Here",
                               style: TextStyle(
-                                fontSize: isSmallScreen ? 14 : 16,
+                                fontSize: (isSmallScreen ? 14 : 16) * textScaleFactor,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryGreen,
                               ),
@@ -279,14 +268,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-            // --- Back Button (consistent with registration flow) ---
+            // --- Back Button ---
             Positioned(
               top: 16,
               left: 20,
               child: GestureDetector(
                 onTap: () {
-                  FocusScope.of(context).unfocus(); // Dismiss keyboard
-                  // Navigate back to the onboarding screen
+                  FocusScope.of(context).unfocus();
                   context.read<NavigationCubit>().navigateToOnboarding();
                 },
                 child: Container(
@@ -317,7 +305,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // --- Helper method for consistent TextField styling ---
-  // (It's a good idea to move this to a shared `widgets` folder later)
   Widget _buildTextField({
     required TextEditingController controller,
     required FocusNode focusNode,
@@ -334,6 +321,10 @@ class _LoginScreenState extends State<LoginScreen> {
     ValueChanged<String>? onFieldSubmitted,
     Widget? prefixIcon,
   }) {
+    // You might also want to apply textScaleFactor to the text style within the InputDecoration
+    // and the TextFormField itself for ultimate consistency, though the current 18px is fairly standard.
+    final textStyle = TextStyle(fontSize: 18 * MediaQuery.of(context).textScaleFactor, color: AppColors.textDark);
+
     return TextFormField(
       controller: controller,
       focusNode: focusNode,
@@ -379,7 +370,7 @@ class _LoginScreenState extends State<LoginScreen> {
         errorStyle: const TextStyle(color: AppColors.errorRed, fontSize: 13),
         suffixIcon: suffixIcon,
       ),
-      style: const TextStyle(fontSize: 18, color: AppColors.textDark),
+      style: textStyle, // Apply the scaled text style
     );
   }
 }

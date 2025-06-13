@@ -1,3 +1,22 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript { // <--- THIS BLOCK IS VITAL AND LIKELY MISSING OR INCOMPLETE
+    ext {
+        kotlin_version = '1.7.10' // Adjust to your Kotlin version if different
+        // Add other global versions here if needed, e.g., compileSdkVersion, targetSdkVersion
+        // You might find these defined in android/local.properties or android/app/build.gradle
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0' // <--- Use your actual Android Gradle Plugin version
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // <--- Needed if using Kotlin
+        classpath 'com.google.gms:google-services:4.4.1' // <--- THIS IS THE CRITICAL LINE FOR FIREBASE
+    }
+}
+
 allprojects {
     repositories {
         google()

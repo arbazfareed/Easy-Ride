@@ -1,25 +1,32 @@
-// lib/main.dart
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 import 'cubits/navigation_cubit.dart';
-import 'cubits/registration/registration_cubit.dart'; // IMPORT RegistrationCubit
+import 'cubits/registration/registration_cubit.dart';
 import 'navigation/app_navigator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  print('Initializing Firebase...');
 
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+  if (kIsWeb) {
+    const FirebaseOptions options = FirebaseOptions(
+      apiKey: "AIzaSyAehmWgGCKMiNJqrNJMZVOJDfH7hoFwHVY",
+      authDomain: "easyride-cb1f4.firebaseapp.com",
+      projectId: "easyride-cb1f4",
+      storageBucket: "easyride-cb1f4.appspot.com",
+      messagingSenderId: "649869651430",
+      appId: "1:649869651430:web:783495bef1d8eda23a7a27",
+      measurementId: "G-S6ZZCBHEXK",
     );
-    print('Firebase initialized successfully!');
-  } catch (e) {
-    print('Error initializing Firebase: $e');
+    await Firebase.initializeApp(options: options);
+  } else {
+    await Firebase.initializeApp(); // Android/iOS uses google-services.json / plist
   }
+
+  print('Firebase initialized successfully!');
 
   runApp(const EasyRideApp());
 }
@@ -29,15 +36,10 @@ class EasyRideApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider( // Use MultiBlocProvider to provide multiple Cubits
+    return MultiBlocProvider(
       providers: [
-        BlocProvider<NavigationCubit>( // Provide NavigationCubit
-          create: (_) => NavigationCubit(),
-        ),
-        BlocProvider<RegistrationCubit>( // NEW: Provide RegistrationCubit here
-          create: (_) => RegistrationCubit(),
-        ),
-        // Add other global Cubits/Blocs here if needed (e.g., AuthCubit)
+        BlocProvider<NavigationCubit>(create: (_) => NavigationCubit()),
+        BlocProvider<RegistrationCubit>(create: (_) => RegistrationCubit()),
       ],
       child: MaterialApp(
         title: 'EasyRide',
@@ -46,7 +48,7 @@ class EasyRideApp extends StatelessWidget {
           primarySwatch: Colors.green,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const AppNavigator(), // AppNavigator will now find RegistrationCubit
+        home: const AppNavigator(),
       ),
     );
   }

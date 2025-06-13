@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easyride/cubits/registration/registration_cubit.dart';
 import 'package:easyride/cubits/registration/registration_state.dart';
-// Corrected import to use the 'as AppColors' alias
 import 'package:easyride/constants/app_colors.dart' as AppColors;
 import '../../cubits/navigation_cubit.dart';
 
@@ -18,9 +17,8 @@ class NameScreen extends StatefulWidget {
 class _NameScreenState extends State<NameScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Using Form for better validation integration
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Added FocusNodes for better keyboard management and UI response
   final FocusNode _firstNameFocusNode = FocusNode();
   final FocusNode _lastNameFocusNode = FocusNode();
 
@@ -36,7 +34,7 @@ class _NameScreenState extends State<NameScreen> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _firstNameFocusNode.dispose(); // Dispose focus nodes
+    _firstNameFocusNode.dispose();
     _lastNameFocusNode.dispose();
     super.dispose();
   }
@@ -44,11 +42,14 @@ class _NameScreenState extends State<NameScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.height < 700;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    // Adjusted thresholds for 'smallScreen' to make elements smaller more often
+    final isVerySmallScreen = size.height < 600; // Even smaller phones
+    final isSmallScreen = size.height < 720;    // Standard small phone screen
     final isTablet = size.width > 600;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Use AppColors prefix
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: BlocListener<RegistrationCubit, RegistrationState>(
           listener: (context, state) {
@@ -56,15 +57,13 @@ class _NameScreenState extends State<NameScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.errorMessage!),
-                  backgroundColor: AppColors.errorRed, // Use AppColors prefix
-                  behavior: SnackBarBehavior.floating, // Makes snackbar float above bottom
+                  backgroundColor: AppColors.errorRed,
+                  behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               );
-              // Consider adding a cubit method to clear the error after display
-              // For example: context.read<RegistrationCubit>().clearErrorMessage();
             }
           },
           child: BlocBuilder<RegistrationCubit, RegistrationState>(
@@ -74,10 +73,10 @@ class _NameScreenState extends State<NameScreen> {
                   Center(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 80 : 24,
-                        vertical: isSmallScreen ? 16 : 32,
+                        horizontal: isTablet ? size.width * 0.1 : 20, // Slightly reduced horizontal padding
+                        vertical: isVerySmallScreen ? 12 : (isSmallScreen ? 16 : 24), // More aggressive vertical padding reduction
                       ),
-                      child: Form( // Wrap with Form widget for validation
+                      child: Form(
                         key: _formKey,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -86,56 +85,60 @@ class _NameScreenState extends State<NameScreen> {
                             // Header with Image and Text
                             Column(
                               children: [
-                                // Image
-                                ClipRRect( // Rounded corners for the image
-                                  borderRadius: BorderRadius.circular(16),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12), // Slightly smaller border radius
                                   child: Image.asset(
                                     'assets/images/s1.jpeg',
-                                    height: isSmallScreen ? 120 : 180, // Adjust height
-                                    width: isSmallScreen ? 120 : 180,  // Keep it square or adjust
+                                    height: isVerySmallScreen ? 100 : (isSmallScreen ? 140 : 180), // More granular image sizing
+                                    width: isVerySmallScreen ? 100 : (isSmallScreen ? 140 : 180),
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      // Fallback for image loading errors
                                       return Icon(
                                         Icons.person_outline,
-                                        size: isSmallScreen ? 100 : 150,
+                                        size: isVerySmallScreen ? 80 : (isSmallScreen ? 120 : 150),
                                         color: AppColors.primaryGreen.withOpacity(0.6),
                                       );
                                     },
                                   ),
                                 ),
-                                const SizedBox(height: 24), // More space below image
-                                Text(
-                                  "What's your name?",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: isSmallScreen ? 28 : 36,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryGreen, // Use AppColors prefix
-                                    letterSpacing: 1.2,
+                                SizedBox(height: isVerySmallScreen ? 16 : 20), // Smaller space below image
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "What's your name?",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: (isVerySmallScreen ? 24 : (isSmallScreen ? 30 : 36)) * textScaleFactor, // More granular font sizing
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryGreen,
+                                      letterSpacing: 1.2,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 8), // Little space before subtitle
-                                Text(
-                                  "Tell us a bit about yourself",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: isSmallScreen ? 16 : 18,
-                                    color: AppColors.textMedium, // Use AppColors prefix
+                                SizedBox(height: isVerySmallScreen ? 6 : 8), // Smaller space before subtitle
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "Tell us a bit about yourself",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: (isVerySmallScreen ? 14 : (isSmallScreen ? 16 : 18)) * textScaleFactor, // More granular font sizing
+                                      color: AppColors.textMedium,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(height: isSmallScreen ? 32 : 48),
+                            SizedBox(height: isVerySmallScreen ? 24 : (isSmallScreen ? 36 : 48)), // More granular vertical spacing
 
-                            // First Name Field with improved styling
+                            // First Name Field
                             _buildTextField(
+                              context: context,
                               controller: _firstNameController,
                               focusNode: _firstNameFocusNode,
                               labelText: 'First Name',
                               hintText: 'e.g., John',
                               onChanged: context.read<RegistrationCubit>().updateFirstName,
-                              // Validator for immediate feedback on empty field
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your first name';
@@ -143,19 +146,19 @@ class _NameScreenState extends State<NameScreen> {
                                 return null;
                               },
                               textCapitalization: TextCapitalization.words,
-                              nextFocusNode: _lastNameFocusNode, // Move focus to next field
-                              prefixIcon: Icon(Icons.person_outline, color: AppColors.lightGreen), // Icon
+                              nextFocusNode: _lastNameFocusNode,
+                              prefixIcon: Icon(Icons.person_outline, color: AppColors.lightGreen),
                             ),
-                            SizedBox(height: isSmallScreen ? 16 : 24),
+                            SizedBox(height: isVerySmallScreen ? 12 : (isSmallScreen ? 18 : 24)), // Smaller space between fields
 
-                            // Last Name Field with improved styling
+                            // Last Name Field
                             _buildTextField(
+                              context: context,
                               controller: _lastNameController,
                               focusNode: _lastNameFocusNode,
                               labelText: 'Last Name',
                               hintText: 'e.g., Doe',
                               onChanged: context.read<RegistrationCubit>().updateLastName,
-                              // Validator for immediate feedback on empty field
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your last name';
@@ -163,27 +166,26 @@ class _NameScreenState extends State<NameScreen> {
                                 return null;
                               },
                               textCapitalization: TextCapitalization.words,
-                              textInputAction: TextInputAction.done, // Done action on last field
+                              textInputAction: TextInputAction.done,
                               onFieldSubmitted: (_) {
-                                // Trigger submit when 'Done' is pressed on keyboard
                                 if (_formKey.currentState!.validate()) {
-                                  FocusScope.of(context).unfocus(); // Dismiss keyboard
+                                  FocusScope.of(context).unfocus();
                                   context.read<RegistrationCubit>().submitName();
                                 }
                               },
-                              prefixIcon: Icon(Icons.person_outline, color: AppColors.lightGreen), // Icon
+                              prefixIcon: Icon(Icons.person_outline, color: AppColors.lightGreen),
                             ),
-                            SizedBox(height: isSmallScreen ? 32 : 48),
+                            SizedBox(height: isVerySmallScreen ? 24 : (isSmallScreen ? 36 : 48)),
 
-                            // Improved Next Button with animation and shadow
+                            // Continue Button
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              height: isSmallScreen ? 50 : 60,
+                              height: isVerySmallScreen ? 45 : (isSmallScreen ? 50 : 60), // Smaller button height
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.primaryGreen.withOpacity(0.3), // Use AppColors prefix
+                                    color: AppColors.primaryGreen.withOpacity(0.3),
                                     blurRadius: 10,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 4),
@@ -192,29 +194,28 @@ class _NameScreenState extends State<NameScreen> {
                               ),
                               child: ElevatedButton(
                                 onPressed: state.isLoading ? null : () {
-                                  // Validate all fields in the Form
                                   if (_formKey.currentState!.validate()) {
-                                    FocusScope.of(context).unfocus(); // Dismiss keyboard
+                                    FocusScope.of(context).unfocus();
                                     context.read<RegistrationCubit>().submitName();
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryGreen, // Use AppColors prefix
+                                  backgroundColor: AppColors.primaryGreen,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
-                                  padding: EdgeInsets.zero, // Remove default padding as container gives space
-                                  elevation: 0, // Elevation handled by BoxDecoration shadow
+                                  padding: EdgeInsets.zero,
+                                  elevation: 0,
                                   textStyle: TextStyle(
-                                    fontSize: isSmallScreen ? 18 : 20,
+                                    fontSize: (isVerySmallScreen ? 16 : (isSmallScreen ? 18 : 20)) * textScaleFactor, // Smaller button text
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 child: state.isLoading
                                     ? SizedBox(
-                                  width: isSmallScreen ? 24 : 28,
-                                  height: isSmallScreen ? 24 : 28,
+                                  width: isVerySmallScreen ? 20 : (isSmallScreen ? 24 : 28), // Smaller indicator
+                                  height: isVerySmallScreen ? 20 : (isSmallScreen ? 24 : 28),
                                   child: CircularProgressIndicator(
                                     strokeWidth: 3,
                                     color: Colors.white,
@@ -229,39 +230,39 @@ class _NameScreenState extends State<NameScreen> {
                               ),
                             ),
 
-                            if (!isSmallScreen) SizedBox(height: size.height * 0.1),
+                            if (!isVerySmallScreen) SizedBox(height: size.height * 0.05), // Adjusted bottom spacing
                           ],
                         ),
                       ),
                     ),
                   ),
 
-                  // Improved Back Button
+                  // Back Button
                   Positioned(
-                    top: 16,
-                    left: 20,
+                    top: 12, // Slightly higher position
+                    left: 16, // Slightly more left
                     child: GestureDetector(
                       onTap: () {
-                        FocusScope.of(context).unfocus(); // Dismiss keyboard
+                        FocusScope.of(context).unfocus();
                         context.read<NavigationCubit>().navigateToOnboarding();
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(7), // Slightly smaller padding
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10), // Slightly smaller border radius
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
-                              blurRadius: 6,
+                              blurRadius: 5, // Smaller blur
                               spreadRadius: 1,
                             ),
                           ],
                         ),
                         child: Icon(
                           Icons.arrow_back_rounded,
-                          color: AppColors.primaryGreen, // Use AppColors prefix
-                          size: 28,
+                          color: AppColors.primaryGreen,
+                          size: 26, // Slightly smaller icon
                         ),
                       ),
                     ),
@@ -276,65 +277,68 @@ class _NameScreenState extends State<NameScreen> {
   }
 
   // --- Helper method for consistent TextField styling ---
-  // (Moved here for easy access, but can be extracted to widgets/shared_text_field.dart)
   Widget _buildTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required FocusNode focusNode,
     required String labelText,
     String? hintText,
     required ValueChanged<String> onChanged,
-    FormFieldValidator<String>? validator, // Changed to FormFieldValidator
+    FormFieldValidator<String>? validator,
     TextInputType keyboardType = TextInputType.text,
     TextCapitalization textCapitalization = TextCapitalization.none,
     TextInputAction textInputAction = TextInputAction.next,
     FocusNode? nextFocusNode,
     ValueChanged<String>? onFieldSubmitted,
-    Widget? prefixIcon, // Added prefixIcon
+    Widget? prefixIcon,
   }) {
-    return TextFormField( // Changed to TextFormField for validator
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+
+    return TextFormField(
       controller: controller,
       focusNode: focusNode,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       textInputAction: textInputAction,
       onChanged: onChanged,
-      validator: validator, // Apply validator
+      validator: validator,
       onFieldSubmitted: onFieldSubmitted ??
               (_) {
             if (nextFocusNode != null) {
               FocusScope.of(context).requestFocus(nextFocusNode);
             } else {
-              FocusScope.of(context).unfocus(); // Dismiss keyboard if no next field
+              FocusScope.of(context).unfocus();
             }
           },
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        labelStyle: const TextStyle(color: AppColors.textMedium), // Use AppColors prefix
-        floatingLabelStyle: const TextStyle(color: AppColors.primaryGreen, fontSize: 18), // Use AppColors prefix
-        prefixIcon: prefixIcon, // Apply prefix icon
+        labelStyle: const TextStyle(color: AppColors.textMedium),
+        floatingLabelStyle: TextStyle(color: AppColors.primaryGreen,
+            fontSize: 16 * textScaleFactor), // Slightly smaller floating label
+        prefixIcon: prefixIcon,
         filled: true,
-        fillColor: Colors.white, // Changed from opacity 0.9 to solid white for contrast
+        fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.lightGreen, width: 1.5), // Slightly thinner border when not focused
-          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.lightGreen, width: 1.5),
+          borderRadius: BorderRadius.circular(10), // Slightly smaller border radius
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2), // Use AppColors prefix
-          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+          borderRadius: BorderRadius.circular(10),
         ),
         errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.errorRed, width: 1.5), // Use AppColors prefix
-          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.errorRed, width: 1.5),
+          borderRadius: BorderRadius.circular(10),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.errorRed, width: 2), // Use AppColors prefix
-          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.errorRed, width: 2),
+          borderRadius: BorderRadius.circular(10),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), // Slightly adjusted padding
-        errorStyle: const TextStyle(color: AppColors.errorRed, fontSize: 13), // Use AppColors prefix
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // Slightly smaller padding
+        errorStyle: TextStyle(color: AppColors.errorRed, fontSize: 12 * textScaleFactor), // Slightly smaller error text
       ),
-      style: const TextStyle(fontSize: 16, color: AppColors.textDark), // Use AppColors prefix and slightly smaller font
+      style: TextStyle(fontSize: 15 * textScaleFactor, color: AppColors.textDark), // Slightly smaller input text
     );
   }
 }
